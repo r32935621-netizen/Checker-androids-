@@ -30,10 +30,11 @@ jobs:
     - name: Build with Buildozer in Docker
       run: |
         docker run --rm \
+          --entrypoint /bin/bash \
           -v $(pwd):/home/user/hostcwd \
           -e BUILDOZER_ALLOW_ROOT=1 \
           kivy/buildozer:latest \
-          bash -c "yes | buildozer -v android debug"
+          -c "yes | buildozer -v android debug"
 
     - name: Correct permissions
       run: |
