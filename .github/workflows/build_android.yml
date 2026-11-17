@@ -11,20 +11,16 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Fix ownership for Docker
+    - name: Build APK with Buildozer Docker
       run: |
-        sudo chown -R $USER:$USER $PWD
+        docker run --rm \
+          -v ${{ github.workspace }}:/home/user/hostcwd \
+          -e BUILDOZER_ALLOW_ROOT=1 \
+          kivy/buildozer:latest android debug
 
-    - name: Build with Buildozer Docker
-      uses: docker://kivy/buildozer:latest
-      env:
-        BUILDOZER_ALLOW_ROOT: "1"
-      with:
-        args: android debug
-
-    - name: Correct APK permissions
+    - name: Correct permissions
       run: |
-        sudo chmod -R 777 bin/
+        sudo chmod -R 777 bin/ || true
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
