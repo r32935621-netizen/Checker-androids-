@@ -5,7 +5,12 @@ from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
-from android.permissions import request_permissions, Permission # type: ignore
+
+try:
+    from android.permissions import request_permissions, Permission  # type: ignore
+    IS_ANDROID = True
+except ImportError:
+    IS_ANDROID = False
 
 KEYWORDS = [
     "minecraft", "cheat", "client", "mod", "wurst", "meteor", "matrix", 
@@ -19,10 +24,14 @@ EXTENSIONS = {".apk", ".zip", ".rar", ".txt", ".json", ".pak"}
 
 class IronMineScannerApp(App):
     def build(self):
-        try:
-            request_permissions([Permission.READ_EXTERNAL_STORAGE, Permission.WRITE_EXTERNAL_STORAGE])
-        except Exception:
-            pass
+        if IS_ANDROID:
+            try:
+                request_permissions([
+                    Permission.READ_EXTERNAL_STORAGE, 
+                    Permission.WRITE_EXTERNAL_STORAGE
+                ])
+            except Exception:
+                pass
 
         layout = BoxLayout(orientation='vertical', padding=40, spacing=20)
         
@@ -77,7 +86,11 @@ class IronMineScannerApp(App):
             
             file_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
             
-            save_path = Path("/sdcard/Download/scan_results_android.txt")
+            save_dir = Path("/sdcard/Download")
+            if not save_dir.exists():
+                save_dir = Path(".")
+                
+            save_path = save_dir / "scan_results_android.txt"
             with open(save_path, "w", encoding="utf-8") as f:
                 f.write(content)
                 f.write(f"\n--- INTEGRITY HASH: {file_hash} ---")
