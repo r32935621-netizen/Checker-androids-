@@ -16,7 +16,7 @@ jobs:
         docker run --rm \
           -v ${{ github.workspace }}:/home/user/hostcwd \
           -e BUILDOZER_ALLOW_ROOT=1 \
-          kivy/buildozer:latest android debug
+          kivy/buildozer:latest bash -c "yes | buildozer android debug"
 
     - name: Correct permissions
       run: |
