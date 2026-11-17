@@ -2,6 +2,10 @@
 title = IronMine Scanner
 package.name = ironminescan
 package.domain = org.ironmine
+
+# Прямо указываем текущую папку как источник
+source.dir = .
+
 source.include_exts = py,png,jpg,kv,atlas
 source.include_patterns = assets/*,images/*.png
 version = 1.0.0
