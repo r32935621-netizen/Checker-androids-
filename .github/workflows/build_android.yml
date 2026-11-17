@@ -8,17 +8,32 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
 
-    - name: Build APK with Buildozer Docker
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Cache Buildozer directories
+      uses: actions/cache@v3
+      with:
+        path: |
+          .buildozer
+          ~/.gradle
+          ~/.android
+        key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}-${{ hashFiles('main.py') }}
+        restore-keys: |
+          ${{ runner.os }}-buildozer-
+
+    - name: Build with Buildozer in Docker
       run: |
         docker run --rm \
-          --entrypoint /bin/bash \
-          -v ${{ github.workspace }}:/home/user/hostcwd \
+          -v $(pwd):/home/user/hostcwd \
           -e BUILDOZER_ALLOW_ROOT=1 \
           kivy/buildozer:latest \
-          -c "yes | buildozer android debug"
+          bash -c "yes | buildozer -v android debug"
 
     - name: Correct permissions
       run: |
