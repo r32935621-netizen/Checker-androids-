@@ -11,24 +11,18 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
+    - name: Fix ownership for Docker
+      run: |
+        sudo chown -R $USER:$USER $PWD
+
+    - name: Build with Buildozer Docker
+      uses: docker://kivy/buildozer:latest
       with:
-        python-version: '3.10'
+        args: android debug
 
-    - name: Install system dependencies
+    - name: Correct APK permissions
       run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential git ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libgstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good autoconf automake libtool pkg-config cmake libffi-dev libssl-dev unzip zip openjdk-17-jdk
-
-    - name: Install Buildozer & Cython
-      run: |
-        pip install --upgrade pip
-        pip install buildozer cython==0.29.36 virtualenv
-
-    - name: Build APK with Buildozer
-      run: |
-        yes | buildozer android debug
+        sudo chmod -R 777 bin/
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
